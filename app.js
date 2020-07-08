@@ -5,24 +5,54 @@ const store = {
   // 5 or more questions are required
   questions: [
     {
-      question: 'What color is broccoli?',
+      question: 'When did the frozen pizza hit the american market?',
       answers: [
-        'red',
-        'orange',
-        'pink',
-        'green'
+        '1824',
+        '1961',
+        '1962',
+        'Frozen pizza isnt pizza at all'
       ],
-      correctAnswer: 'green'
+      correctAnswer: '1962'
     },
     {
-      question: 'What is the current year?',
+      question: 'Pineapple on pizza was invented where??',
       answers: [
-        '1970',
-        '2015',
-        '2019',
-        '2005'
+        'Canada',
+        'Japan',
+        'Italy',
+        'United States'
       ],
-      correctAnswer: '2019'
+      correctAnswer: 'Canada'
+    },
+    {
+      question: 'The health benefits of pizza are?',
+      answers: [
+        'Cures everything.',
+        'Reduces heart disease.',
+        'Reduces cancer risk.',
+        'Lol there are no benefits.'
+      ],
+      correctAnswer: 'Reduces cancer risk.'
+    },
+    {
+      question: 'In japan what is the favored way to eat pizza?',
+      answers: [
+        'With taco sauce.',
+        'With Mayo.',
+        'With fried bananas.',
+        'With teriyaki sauce and butter.'
+      ],
+      correctAnswer: 'With Mayo.'
+    },
+    {
+      question: 'What month is national pizza month?',
+      answers: [
+        'December',
+        'October',
+        'January',
+        'EVERY MONTH'
+      ],
+      correctAnswer: 'October'
     }
   ],
   quizStarted: false,
