@@ -57,7 +57,8 @@ let store = {
   ],
   quizStarted: false,
   questionNumber: 0,
-  score: 0
+  score: 0,
+  maxLength:5
 };
 
 
@@ -65,7 +66,7 @@ let store = {
 function render()
 {
   $("#quiz-window").html(constructQuiz(store.questions[store.questionNumber]));
-  
+  initSubmit();
   console.log("rendering, wooooo."); 
 }
 function constructQuiz(question)
@@ -84,22 +85,24 @@ function constructQuiz(question)
           </form>`
   console.log("quiz constructed.");
 }
-function goToQuestion(question)
-{
-  console.log("switching to new question.");
-}
+
 function quizApp()
 {
   render();
-  initSubmit();
+  
+  
+  
   console.log("Main function");
 }
 
 
 //TODO
-function evaluateAnswer() {
+function evaluateAnswer(selectedAnswer) {
+  let correctAnswer = store.questions[store.questionNumber].correctAnswer;
   //Get currently selected radio
-
+  console.log(correctAnswer);
+  return selectedAnswer == correctAnswer;
+  
   //Compare selected radio to actual answer from current question object
   
 }
@@ -107,18 +110,40 @@ function evaluateAnswer() {
 function flagStatus(selectedRadio, eval) {
   //Take answer and change text class to match correct or incorrect
   if (eval) {
-    selectedRadio.attr("class", "correct");
+    selectedRadio.attr("class","correct");
+    
+  }
+  else
+  {
+    //selectedRadio.attr("class", "incorrect");
+    console.log("WRONG!");
   }
 }
-
+function nextQuestion(eval)
+{
+  if(eval)
+  {
+    store.questionNumber = (store.questionNumber + 1)%store.maxLength;
+  }
+}
 //TODO
 //Initialize the submit button
 function initSubmit() {
   $('#quiz-form').on("submit", function(e) {
     e.preventDefault();
     //Check answers/radio buttons
-    let selected = $("input[name='quiz-question']:checked").val();
-    store.questionNumber++;
+    let selected = $("input[name='quiz-question']:checked");
+    
+    flagStatus(selected,evaluateAnswer(selected.val()));
+    nextQuestion(evaluateAnswer(selected.val()));
+    
+
+
+    //Next question- todo: only if correct.
+    
+
+    
+    
     render();
     //console.log($("input[name='quiz-question']:checked").val());
   });
