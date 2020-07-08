@@ -6,52 +6,52 @@ const store = {
   questions: [
     {
       question: 'When did the frozen pizza hit the american market?',
-      answers: [
-        '1824',
-        '1961',
-        '1962',
-        'Frozen pizza isnt pizza at all'
-      ],
+      answers: {
+        a:'1824',
+        b:'1961',
+        c:'1962',
+        d:'Frozen pizza isnt pizza at all'
+      },
       correctAnswer: '1962'
     },
     {
       question: 'Pineapple on pizza was invented where??',
-      answers: [
-        'Canada',
-        'Japan',
-        'Italy',
-        'United States'
-      ],
+      answers: {
+        a:'Canada',
+        b:'Japan',
+        c:'Italy',
+        d:'United States'
+      },
       correctAnswer: 'Canada'
     },
     {
       question: 'The health benefits of pizza are?',
-      answers: [
-        'Cures everything.',
-        'Reduces heart disease.',
-        'Reduces cancer risk.',
-        'Lol there are no benefits.'
-      ],
+      answers: {
+        a:'Cures everything.',
+        b:'Reduces heart disease.',
+        c:'Reduces cancer risk.',
+        d:'Lol there are no benefits.'
+      },
       correctAnswer: 'Reduces cancer risk.'
     },
     {
       question: 'In japan what is the favored way to eat pizza?',
-      answers: [
-        'With taco sauce.',
-        'With Mayo.',
-        'With fried bananas.',
-        'With teriyaki sauce and butter.'
-      ],
+      answers: {
+        a:'With taco sauce.',
+        b:'With Mayo.',
+        c:'With fried bananas.',
+        d:'With teriyaki sauce and butter.'
+      },
       correctAnswer: 'With Mayo.'
     },
     {
       question: 'What month is national pizza month?',
-      answers: [
-        'December',
-        'October',
-        'January',
-        'EVERY MONTH'
-      ],
+      answers: {
+        a:'December',
+        b:'October',
+        c:'January',
+        d:'EVERY MONTH'
+      },
       correctAnswer: 'October'
     }
   ],
@@ -59,6 +59,43 @@ const store = {
   questionNumber: 0,
   score: 0
 };
+
+
+
+function render()
+{
+  $("#quiz-window").html(constructQuiz(store.questions[3]));
+  console.log("rendering, wooooo."); 
+}
+function constructQuiz(question)
+{
+  return `<h3>${question.question}</h3>
+          <form>
+            <input type="radio" name="quiz-question" value="${question.answers.a}"/>
+            <label>${question.answers.a}</label><br>
+            <input type="radio" name="quiz-question" value="${question.answers.b}"/>
+            <label>${question.answers.b}</label><br>
+            <input type="radio" name="quiz-question" value="${question.answers.c}"/>
+            <label>${question.answers.c}</label><br>
+            <input type="radio" name="quiz-question" value="${question.answers.d}"/>
+            <label>${question.answers.d}</label><br>
+            <button id="submit-answer" type="submit">Submit</button>
+          </form>`
+  console.log("quiz constructed.");
+}
+function goToQuestion(question)
+{
+  console.log("switching to new question.");
+}
+function quizApp()
+{
+  render();
+  console.log("Main function");
+}
+
+
+$(quizApp);
+
 
 /**
  * 
