@@ -6,3 +6,19 @@
   * https://github.com/andreacardybailey/responsive_example/blob/master/styles/responsive-base.css 
   *
 */
+
+.question {
+
+}
+
+.question-container {
+
+}
+
+.correct {
+  color: #080;
+}
+
+.incorrect {
+  color: #a00;
+}

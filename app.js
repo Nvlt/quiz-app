@@ -1,7 +1,7 @@
 /**
  * Example store structure
  */
-const store = {
+let store = {
   // 5 or more questions are required
   questions: [
     {
@@ -64,13 +64,14 @@ const store = {
 
 function render()
 {
-  $("#quiz-window").html(constructQuiz(store.questions[3]));
+  $("#quiz-window").html(constructQuiz(store.questions[store.questionNumber]));
+  
   console.log("rendering, wooooo."); 
 }
 function constructQuiz(question)
 {
   return `<h3>${question.question}</h3>
-          <form>
+          <form id="quiz-form">
             <input type="radio" name="quiz-question" value="${question.answers.a}"/>
             <label>${question.answers.a}</label><br>
             <input type="radio" name="quiz-question" value="${question.answers.b}"/>
@@ -90,11 +91,42 @@ function goToQuestion(question)
 function quizApp()
 {
   render();
+  initSubmit();
   console.log("Main function");
 }
 
 
+//TODO
+function evaluateAnswer() {
+  //Get currently selected radio
+
+  //Compare selected radio to actual answer from current question object
+  
+}
+
+function flagStatus(selectedRadio, eval) {
+  //Take answer and change text class to match correct or incorrect
+  if (eval) {
+    selectedRadio.attr("class", "correct");
+  }
+}
+
+//TODO
+//Initialize the submit button
+function initSubmit() {
+  $('#quiz-form').on("submit", function(e) {
+    e.preventDefault();
+    //Check answers/radio buttons
+    let selected = $("input[name='quiz-question']:checked").val();
+    store.questionNumber++;
+    render();
+    //console.log($("input[name='quiz-question']:checked").val());
+  });
+}
+
+
 $(quizApp);
+
 
 
 /**
