@@ -62,28 +62,35 @@ let store = {
 };
 
 
+
+//***MAIN FUNCTION***//
 //Run full Quiz App
-//MAIN FUNCTIOn
 function quizAppMain()
 {
-  render();
+  //Should render first page before rendering quiz pages
+  //Render first page
+
+  //Remove below after first page is established
+  renderQuizPage();
+
+  //Probably put in quizPage function
   initSubmit();
 }
 
 
-//Create quiz
-function constructQuiz(questionPool)
+//***CONSTRUCTION/TEMPLATE FUNCTIONS FOR HTML PAGES***//
+//Create template form for quiz
+function constructQuiz()
 {
-  //${constructQuestion(questionPool)}
   return `
     <form id="quiz-form">
       
     </form>
     `;
 }
-//Create question to place inside quiz
+//Create template for question to place inside quiz form
 function constructQuestion(question) {
-  $("#quiz-form").html(`
+  return `
     <h3>${question.question}</h3>
     <div class="question-container">
     <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.a}"/>
@@ -96,12 +103,13 @@ function constructQuestion(question) {
     <label>${question.answers.d}</label><br></span>
     </div>
     <button id="submit-answer" type="submit">Submit</button>
-  `);
+  `;
 }
 
 
+//***RENDERING FUNCTION SECTION***//
 //Display full page
-function render()
+function renderQuizPage()
 {
   renderQuiz();
   renderQuestion();
@@ -110,19 +118,19 @@ function render()
 //Display quiz
 function renderQuiz()
 {
-  $("#quiz-window").html(constructQuiz(store.questionPool[store.questionNumber]));
+  $("#quiz-window").html(constructQuiz());
 }
 
 //Display question
 function renderQuestion()
 {
-  constructQuestion(store.questionPool[store.questionNumber]);
+  $("#quiz-form").html(constructQuestion(store.questionPool[store.questionNumber]));
 }
 
 
 
 
-
+//***EVALUATION FUNCTIONS***//
 //Check given answer matches correct answer
 function evaluateAnswer(selectedAnswer) {
   let correctAnswer = store.questionPool[store.questionNumber].correctAnswer;
@@ -134,14 +142,14 @@ function evaluateAnswer(selectedAnswer) {
 //Flag answer based on given evaluation
 function flagStatus(selectedRadio, eval) {
   //Take answer and change text class to match correct or incorrect
-  let lbl = selectedRadio.next("label");
+  let questionLabel = selectedRadio.next("label");
   //Set correct answer to '.correct' class, probably remove this part in favor of another indicator though
   if (eval) {
-    $(lbl).attr("class", "correct")
+    $(questionLabel).attr("class", "correct")
   }
   //Set selected answer to '.incorrect' class
   else {
-    $(lbl).attr("class", "incorrect")
+    $(questionLabel).attr("class", "incorrect")
   }
 }
 
@@ -151,29 +159,23 @@ function nextQuestion(eval)
   if(eval)
   {
     store.questionNumber = (store.questionNumber + 1)%store.maxLength;
+    renderQuestion();
   }
 }
 
-//TODO
+//***BUTTON/EVENT FUNCTIONS ***/
 //Initialize the submit button
 function initSubmit() {
   $('#quiz-form').on("submit", function(e) {
     e.preventDefault();
     //Check answers/radio buttons
     let selectedAnswer = $("input[name='quiz-question']:checked");
+    //Check selected answer with actual answer for current question
     let evalResult = evaluateAnswer(selectedAnswer.val());
+    //Change selected label if wrong, otherwise move on to next question
     flagStatus(selectedAnswer, evalResult);
+    //If correct, render the next question
     nextQuestion(evalResult);
-    
-
-
-    //Next question- todo: only if correct.
-    
-
-    
-    //Render next question
-    renderQuestion();
-    //console.log($("input[name='quiz-question']:checked").val());
   });
 }
 
