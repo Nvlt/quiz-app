@@ -2,8 +2,8 @@
  * Example store structure
  */
 let store = {
-  // 5 or more questions are required
-  questions: [
+  // 5 or more questionPool are required
+  questionPool: [
     {
       question: 'When did the frozen pizza hit the american market?',
       answers: {
@@ -62,63 +62,85 @@ let store = {
 };
 
 
+//Create quiz
+function constructQuiz(questionPool)
+{
+  //${constructQuestion(questionPool)}
+  return `
+    <form id="quiz-form">
+      
+      
+    </form>
+    `;
+}
+//Create question to place inside quiz
+function constructQuestion(question) {
+  $("#quiz-form").html(`
+    <h3>${question.question}</h3>
+    <input type="radio" name="quiz-question" value="${question.answers.a}"/>
+    <label>${question.answers.a}</label><br>
+    <input type="radio" name="quiz-question" value="${question.answers.b}"/>
+    <label>${question.answers.b}</label><br>
+    <input type="radio" name="quiz-question" value="${question.answers.c}"/>
+    <label>${question.answers.c}</label><br>
+    <input type="radio" name="quiz-question" value="${question.answers.d}"/>
+    <label>${question.answers.d}</label><br>
+    <button id="submit-answer" type="submit">Submit</button>
+  `);
+}
 
+//Display full page
 function render()
 {
-  $("#quiz-window").html(constructQuiz(store.questions[store.questionNumber]));
-  initSubmit();
-  console.log("rendering, wooooo."); 
+
 }
-function constructQuiz(question)
+
+//Display quiz
+function renderQuiz()
 {
-  return `<h3>${question.question}</h3>
-          <form id="quiz-form">
-            <input type="radio" name="quiz-question" value="${question.answers.a}"/>
-            <label>${question.answers.a}</label><br>
-            <input type="radio" name="quiz-question" value="${question.answers.b}"/>
-            <label>${question.answers.b}</label><br>
-            <input type="radio" name="quiz-question" value="${question.answers.c}"/>
-            <label>${question.answers.c}</label><br>
-            <input type="radio" name="quiz-question" value="${question.answers.d}"/>
-            <label>${question.answers.d}</label><br>
-            <button id="submit-answer" type="submit">Submit</button>
-          </form>`
-  console.log("quiz constructed.");
+  $("#quiz-window").html(constructQuiz(store.questionPool[store.questionNumber]));
+}
+
+//Display question
+function renderQuestion()
+{
+  constructQuestion(store.questionPool[store.questionNumber]);
 }
 
 function quizApp()
 {
-  render();
-  
+  renderQuiz();
+  renderQuestion();
+  initSubmit();
   
   
   console.log("Main function");
 }
 
 
-//TODO
+//Check given answer matches correct answer
 function evaluateAnswer(selectedAnswer) {
-  let correctAnswer = store.questions[store.questionNumber].correctAnswer;
-  //Get currently selected radio
+  let correctAnswer = store.questionPool[store.questionNumber].correctAnswer;
   console.log(correctAnswer);
-  return selectedAnswer == correctAnswer;
-  
-  //Compare selected radio to actual answer from current question object
-  
+  //compare selected answer to correct answer
+  return selectedAnswer == correctAnswer;  
 }
 
+//Flag answer based on given evaluation
 function flagStatus(selectedRadio, eval) {
   //Take answer and change text class to match correct or incorrect
+  let lbl = selectedRadio.next("label");
+  //Set correct answer to '.correct' class, probably remove this part in favor of another indicator though
   if (eval) {
-    selectedRadio.attr("class","correct");
-    
+    $(lbl).attr("class", "correct")
   }
-  else
-  {
-    //selectedRadio.attr("class", "incorrect");
-    console.log("WRONG!");
+  //Set selected answer to '.incorrect' class
+  else {
+    $(lbl).attr("class", "incorrect")
   }
 }
+
+//Check and go to next question
 function nextQuestion(eval)
 {
   if(eval)
@@ -126,16 +148,17 @@ function nextQuestion(eval)
     store.questionNumber = (store.questionNumber + 1)%store.maxLength;
   }
 }
+
 //TODO
 //Initialize the submit button
 function initSubmit() {
   $('#quiz-form').on("submit", function(e) {
     e.preventDefault();
     //Check answers/radio buttons
-    let selected = $("input[name='quiz-question']:checked");
-    
-    flagStatus(selected,evaluateAnswer(selected.val()));
-    nextQuestion(evaluateAnswer(selected.val()));
+    let selectedAnswer = $("input[name='quiz-question']:checked");
+    let evalResult = evaluateAnswer(selectedAnswer.val());
+    flagStatus(selectedAnswer, evalResult);
+    nextQuestion(evalResult);
     
 
 
@@ -144,7 +167,7 @@ function initSubmit() {
 
     
     
-    render();
+    renderQuestion();
     //console.log($("input[name='quiz-question']:checked").val());
   });
 }
