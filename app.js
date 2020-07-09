@@ -60,11 +60,12 @@ let store = {
       correct: true
     }
   ],
-  quizStarted: false,
+  lastSelected:"",
   questionNumber: 0,
   score: 0,
-
+  pageType:0,
   getQuizLength: function() { return this.questionPool.length },
+  nextQuestion: function() {this.questionNumber = (this.questionNumber + 1)%this.getQuizLength();}
 };
 
 
@@ -77,11 +78,10 @@ function quizAppMain()
   //Render first page
 
   //Remove below after first page is established
-  renderQuizPage();
+  render();
 
   //Probably put in quizPage function
-  handleSubmitButton();
-  handleContinueButton();
+  
 }
 
 
@@ -98,38 +98,91 @@ function constructQuiz()
     `;
 }
 //Create template for question to place inside quiz form
-function constructQuestion(question) {
+function constructQuestion(quizQuestion) {
   return `
-    <h3>${question.question}</h3>
+    <header>
+    <h3>${quizQuestion.question}</h3>
+    <h3>Question:${store.questionNumber + 1}/${store.getQuizLength()}</h3>
+    </header>
     <div class="question-container">
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.a}"/>
-      <label>${question.answers.a}</label><br></span>
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.b}"/>
-      <label>${question.answers.b}</label><br></span>
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.c}"/>
-      <label>${question.answers.c}</label><br></span>
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.d}"/>
-      <label>${question.answers.d}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${quizQuestion.answers.a}"/>
+      <label>${quizQuestion.answers.a}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${quizQuestion.answers.b}"/>
+      <label>${quizQuestion.answers.b}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${quizQuestion.answers.c}"/>
+      <label>${quizQuestion.answers.c}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${quizQuestion.answers.d}"/>
+      <label>${quizQuestion.answers.d}</label><br></span>
     </div>
     <button id="submit-answer" type="submit">Submit</button>
   `;
 }
-function constructAnswerPage(selectedAnswer, question) {
+function constructAnswerPage(quizQuestion) {
+  console.log(quizQuestion);
   return `
-    <h2>You picked ${selectedAnswer}</h2>
-    <h2>The answer was ${question.correctAnswer}</h2>
+    <h2>${quizQuestion.question}</h2>
+    <h2>The answer was ${quizQuestion.correctAnswer}</h2>
     <button id="continue" type="button">Contine</button>
     `;
 }
-
+function constructStartPage() {
+  return `
+    
+    <h3>Click start to begin.</h3>
+    <button id="start" type="button">Start Quiz</button>
+    `;
+}
+function constructResultPage() {
+  return `
+    <h2>You got:${store.score * (100/store.getQuizLength())}%!!!</h2>
+    <h2>Try again?</h2>
+    <button id="reset" type="button">restart</button>
+    `;
+}
 
 //***RENDERING FUNCTION SECTION***//
 //These should not create the html templates
 //Display full page
-function renderQuizPage()
+function render()
 {
-  renderQuiz();
-  renderQuestion();
+
+  switch(store.pageType)
+  {
+    //Start Page
+    case 0:
+      renderQuiz();
+      renderStartPage();
+      handleStartButton()
+      break;
+    //Question Page
+    case 1:
+      renderQuiz();
+      renderQuestion();
+      handleSubmitButton();
+      break;
+    //Answer Page
+    case 2:
+      renderAnswerPage();
+      handleContinueButton();
+      break;
+    //Result Page
+    case 3:
+      renderQuiz();
+      renderResultPage();
+      handleResetButton();
+      break;
+    
+  }
+  
+  
+}
+//Reset quiz values
+function initValues()
+{
+  store.questionNumber = 0;
+  store.score = 0;
+  store.pageType = 0;
+  store.lastSelected = "";
 }
 
 //Display quiz
@@ -144,9 +197,17 @@ function renderQuestion()
   $("#quiz-form").html(constructQuestion(store.questionPool[store.questionNumber]));
 }
 //Display answer page
-function renderAnswerPage(selectedAnswer)
+function renderAnswerPage()
 {
-  $("#quiz-form").html(constructAnswerPage(selectedAnswer, store.questionPool[store.questionNumber]));
+  $("#quiz-form").html(constructAnswerPage(store.questionPool[store.questionNumber]));
+}
+function renderStartPage()
+{
+  $("#quiz-form").html(constructStartPage());
+}
+function renderResultPage()
+{
+  $("#quiz-form").html(constructResultPage());
 }
 
 
@@ -156,42 +217,16 @@ function renderAnswerPage(selectedAnswer)
 function evaluateAnswer(selectedAnswer) {
   //Check if an answer is picked
   if (selectedAnswer !== undefined) {
-    goToAnswer(selectedAnswer)
+    
+    return store.questionPool[store.questionNumber].correctAnswer == selectedAnswer;
+
   }
   //Request user to pick an answer
-  return undefined;
+  throw Error("No answer.");
 }
 
-//Flag answer based on given evaluation
-function flagStatus(selectedRadio, eval) {
-  //Take answer and change text class to match correct or incorrect
-  let questionLabel = selectedRadio.next("label");
-  //Set correct answer to '.correct' class, probably remove this part in favor of another indicator though
-  if (eval) {
-    $(questionLabel).attr("class", "correct")
-  }
-  //Set selected answer to '.incorrect' class
-  else {
-    $(questionLabel).attr("class", "incorrect")
-  }
-}
 
-function goToAnswer(selectedAnswer)
-{
-  //If the user has made an answer
-  renderAnswerPage(selectedAnswer);
-  store.questionNumber = (store.questionNumber + 1)%store.getQuizLength();
-}
 
-//Check and go to next question
-// function goToAnswer(selectedAnswer, eval)
-// {
-//   //If the user has made an answer
-//   if (eval !== undefined) {
-//     renderAnswerPage(selectedAnswer);
-//     store.questionNumber = (store.questionNumber + 1)%store.getQuizLength();
-//   }
-// }
 
 //***BUTTON/EVENT FUNCTIONS ***/
 //Initialize the submit button
@@ -200,18 +235,75 @@ function handleSubmitButton() {
     e.preventDefault();
     //Check answers/radio buttons
     let selectedAnswer = $("input[name='quiz-question']:checked");
+    store.lastSelected = selectedAnswer;
     //Check selected answer with actual answer for current question
     let evalResult = evaluateAnswer(selectedAnswer.val());
+    if(evalResult)
+    {
+      store.score++;
+    }
+    store.pageType = 2;
+    console.log(store.questionNumber);
+    render();
     //If answered, render the next question
     //goToAnswer(selectedAnswer, evalResult);
+    
   });
 }
 
 function handleContinueButton() {
+  
+  $('html').on("keydown", function(e) {
+    if(e.which == 13 || e.which == 39)
+    {
+      continueBtn(e);
+      $('html').off("keydown");
+    }
+    else
+    {
+      console.log(e.which);
+    }
+    
+  });
+
   $('#quiz-form').on("click", "#continue", function(e) {
-    e.preventDefault();
+    continueBtn(e);
+  });
+}
+function continueBtn(e)
+{
+  e.preventDefault();
     console.log("Continue!!!");
-    renderQuestion();
+    store.pageType = 1;
+    if(store.questionNumber == (store.getQuizLength()-1))
+    {
+      store.pageType = 3;
+    }
+    else
+    {
+      store.nextQuestion();
+    }
+    
+    
+    render();
+}
+function handleStartButton()
+{
+  $('#quiz-form').on("click", "#start", function(e) {
+    e.preventDefault();
+    console.log("Start!");
+    store.pageType = 1;
+    render();
+    
+  });
+}
+function handleResetButton()
+{
+  $('#quiz-form').on("click", "#reset", function(e) {
+    e.preventDefault();
+    console.log("resetPressed");
+    initValues();
+    render();
   });
 }
 
