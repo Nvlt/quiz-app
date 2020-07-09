@@ -62,13 +62,21 @@ let store = {
 };
 
 
+//Run full Quiz App
+//MAIN FUNCTIOn
+function quizAppMain()
+{
+  render();
+  initSubmit();
+}
+
+
 //Create quiz
 function constructQuiz(questionPool)
 {
   //${constructQuestion(questionPool)}
   return `
     <form id="quiz-form">
-      
       
     </form>
     `;
@@ -77,22 +85,26 @@ function constructQuiz(questionPool)
 function constructQuestion(question) {
   $("#quiz-form").html(`
     <h3>${question.question}</h3>
-    <input type="radio" name="quiz-question" value="${question.answers.a}"/>
-    <label>${question.answers.a}</label><br>
-    <input type="radio" name="quiz-question" value="${question.answers.b}"/>
-    <label>${question.answers.b}</label><br>
-    <input type="radio" name="quiz-question" value="${question.answers.c}"/>
-    <label>${question.answers.c}</label><br>
-    <input type="radio" name="quiz-question" value="${question.answers.d}"/>
-    <label>${question.answers.d}</label><br>
+    <div class="question-container">
+    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.a}"/>
+    <label>${question.answers.a}</label><br></span>
+    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.b}"/>
+    <label>${question.answers.b}</label><br></span>
+    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.c}"/>
+    <label>${question.answers.c}</label><br></span>
+    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.d}"/>
+    <label>${question.answers.d}</label><br></span>
+    </div>
     <button id="submit-answer" type="submit">Submit</button>
   `);
 }
 
+
 //Display full page
 function render()
 {
-
+  renderQuiz();
+  renderQuestion();
 }
 
 //Display quiz
@@ -107,15 +119,8 @@ function renderQuestion()
   constructQuestion(store.questionPool[store.questionNumber]);
 }
 
-function quizApp()
-{
-  renderQuiz();
-  renderQuestion();
-  initSubmit();
-  
-  
-  console.log("Main function");
-}
+
+
 
 
 //Check given answer matches correct answer
@@ -123,7 +128,7 @@ function evaluateAnswer(selectedAnswer) {
   let correctAnswer = store.questionPool[store.questionNumber].correctAnswer;
   console.log(correctAnswer);
   //compare selected answer to correct answer
-  return selectedAnswer == correctAnswer;  
+  return selectedAnswer === correctAnswer;  
 }
 
 //Flag answer based on given evaluation
@@ -166,14 +171,14 @@ function initSubmit() {
     
 
     
-    
+    //Render next question
     renderQuestion();
     //console.log($("input[name='quiz-question']:checked").val());
   });
 }
 
 
-$(quizApp);
+$(quizAppMain);
 
 
 
