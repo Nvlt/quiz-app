@@ -17,6 +17,10 @@ h1 {
   margin: 10px;
 }
 
+h2 {
+  color: white;
+}
+
 .question-container {
   background-color: #686868;
   margin: 10px;

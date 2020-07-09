@@ -2,7 +2,7 @@
  * Example store structure
  */
 let store = {
-  // 5 or more questionPool are required
+  // 5 or more in questionPool are required
   questionPool: [
     {
       question: 'When did the frozen pizza hit the american market?',
@@ -12,7 +12,8 @@ let store = {
         c:'1962',
         d:'Frozen pizza isnt pizza at all'
       },
-      correctAnswer: '1962'
+      correctAnswer: '1962',
+      correct: true
     },
     {
       question: 'Pineapple on pizza was invented where??',
@@ -22,7 +23,8 @@ let store = {
         c:'Italy',
         d:'United States'
       },
-      correctAnswer: 'Canada'
+      correctAnswer: 'Canada',
+      correct: true
     },
     {
       question: 'The health benefits of pizza are?',
@@ -32,7 +34,8 @@ let store = {
         c:'Reduces cancer risk.',
         d:'Lol there are no benefits.'
       },
-      correctAnswer: 'Reduces cancer risk.'
+      correctAnswer: 'Reduces cancer risk.',
+      correct: true
     },
     {
       question: 'In japan what is the favored way to eat pizza?',
@@ -42,7 +45,8 @@ let store = {
         c:'With fried bananas.',
         d:'With teriyaki sauce and butter.'
       },
-      correctAnswer: 'With Mayo.'
+      correctAnswer: 'With Mayo.',
+      correct: true
     },
     {
       question: 'What month is national pizza month?',
@@ -52,13 +56,15 @@ let store = {
         c:'January',
         d:'EVERY MONTH'
       },
-      correctAnswer: 'October'
+      correctAnswer: 'October',
+      correct: true
     }
   ],
   quizStarted: false,
   questionNumber: 0,
   score: 0,
-  maxLength:5
+
+  getQuizLength: function() { return this.questionPool.length },
 };
 
 
@@ -74,7 +80,8 @@ function quizAppMain()
   renderQuizPage();
 
   //Probably put in quizPage function
-  initSubmit();
+  handleSubmitButton();
+  handleContinueButton();
 }
 
 
@@ -83,9 +90,11 @@ function quizAppMain()
 function constructQuiz()
 {
   return `
-    <form id="quiz-form">
-      
-    </form>
+    <div class="quiz-container">
+      <form id="quiz-form">
+        
+      </form>
+    </div>
     `;
 }
 //Create template for question to place inside quiz form
@@ -93,21 +102,29 @@ function constructQuestion(question) {
   return `
     <h3>${question.question}</h3>
     <div class="question-container">
-    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.a}"/>
-    <label>${question.answers.a}</label><br></span>
-    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.b}"/>
-    <label>${question.answers.b}</label><br></span>
-    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.c}"/>
-    <label>${question.answers.c}</label><br></span>
-    <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.d}"/>
-    <label>${question.answers.d}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.a}"/>
+      <label>${question.answers.a}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.b}"/>
+      <label>${question.answers.b}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.c}"/>
+      <label>${question.answers.c}</label><br></span>
+      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.d}"/>
+      <label>${question.answers.d}</label><br></span>
     </div>
     <button id="submit-answer" type="submit">Submit</button>
   `;
 }
+function constructAnswerPage(selectedAnswer, question) {
+  return `
+    <h2>You picked ${selectedAnswer}</h2>
+    <h2>The answer was ${question.correctAnswer}</h2>
+    <button id="continue" type="button">Contine</button>
+    `;
+}
 
 
 //***RENDERING FUNCTION SECTION***//
+//These should not create the html templates
 //Display full page
 function renderQuizPage()
 {
@@ -126,17 +143,23 @@ function renderQuestion()
 {
   $("#quiz-form").html(constructQuestion(store.questionPool[store.questionNumber]));
 }
-
+//Display answer page
+function renderAnswerPage(selectedAnswer)
+{
+  $("#quiz-form").html(constructAnswerPage(selectedAnswer, store.questionPool[store.questionNumber]));
+}
 
 
 
 //***EVALUATION FUNCTIONS***//
 //Check given answer matches correct answer
 function evaluateAnswer(selectedAnswer) {
-  let correctAnswer = store.questionPool[store.questionNumber].correctAnswer;
-  console.log(correctAnswer);
-  //compare selected answer to correct answer
-  return selectedAnswer === correctAnswer;  
+  //Check if an answer is picked
+  if (selectedAnswer !== undefined) {
+    goToAnswer(selectedAnswer)
+  }
+  //Request user to pick an answer
+  return undefined;
 }
 
 //Flag answer based on given evaluation
@@ -153,32 +176,44 @@ function flagStatus(selectedRadio, eval) {
   }
 }
 
-//Check and go to next question
-function nextQuestion(eval)
+function goToAnswer(selectedAnswer)
 {
-  if(eval)
-  {
-    store.questionNumber = (store.questionNumber + 1)%store.maxLength;
-    renderQuestion();
-  }
+  //If the user has made an answer
+  renderAnswerPage(selectedAnswer);
+  store.questionNumber = (store.questionNumber + 1)%store.getQuizLength();
 }
+
+//Check and go to next question
+// function goToAnswer(selectedAnswer, eval)
+// {
+//   //If the user has made an answer
+//   if (eval !== undefined) {
+//     renderAnswerPage(selectedAnswer);
+//     store.questionNumber = (store.questionNumber + 1)%store.getQuizLength();
+//   }
+// }
 
 //***BUTTON/EVENT FUNCTIONS ***/
 //Initialize the submit button
-function initSubmit() {
+function handleSubmitButton() {
   $('#quiz-form').on("submit", function(e) {
     e.preventDefault();
     //Check answers/radio buttons
     let selectedAnswer = $("input[name='quiz-question']:checked");
     //Check selected answer with actual answer for current question
     let evalResult = evaluateAnswer(selectedAnswer.val());
-    //Change selected label if wrong, otherwise move on to next question
-    flagStatus(selectedAnswer, evalResult);
-    //If correct, render the next question
-    nextQuestion(evalResult);
+    //If answered, render the next question
+    //goToAnswer(selectedAnswer, evalResult);
   });
 }
 
+function handleContinueButton() {
+  $('#quiz-form').on("click", "#continue", function(e) {
+    e.preventDefault();
+    console.log("Continue!!!");
+    renderQuestion();
+  });
+}
 
 $(quizAppMain);
 
