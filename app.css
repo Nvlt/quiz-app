@@ -9,6 +9,7 @@
 
 body {
   background-color: #131313;
+  transition-duration: 2s;
 }
 
 h1 {
@@ -36,6 +37,7 @@ h2 {
   background-color: #454545;
   border: 4px solid #111;
   border-radius: 0.8em;
+  transition-duration: 2s;
 }
 
 #quiz-form h3 {
@@ -62,10 +64,34 @@ h2 {
   background-color: #a40;
 }
 
-.correct {
-  color: #080;
+#quiz-form .correct {
+  background-color: #080;
+  border: 2px solid #040;
 }
 
-.incorrect {
-  color: #f33;
+#quiz-form .correct:hover {
+  background-color: #050;
+}
+
+#quiz-form .incorrect {
+  background-color: #800;
+  border: 2px solid #400;
+}
+
+#quiz-form .incorrect:hover { 
+  background-color: #500;
+}
+
+.correct-body {
+  background-color: #131813;
+}
+.incorrect-body {
+  background-color: #181313;
+}
+
+#quiz-form.correct-form {
+  background-color: #455545;
+}
+#quiz-form.incorrect-form {
+  background-color: #554545;
 }
