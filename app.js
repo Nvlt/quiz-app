@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Example store structure
  */
@@ -38,14 +39,14 @@ let store = {
       correct: true
     },
     {
-      question: 'In japan what is the favored way to eat pizza?',
+      question: 'In Japan what is the favored way to eat pizza?',
       answers: [
         'With taco sauce.',
-        'With Mayo.',
+        'With mayo.',
         'With fried bananas.',
         'With teriyaki sauce and butter.'
       ],
-      correctAnswer: 'With Mayo.',
+      correctAnswer: 'With mayo.',
       correct: true
     },
     {
@@ -60,12 +61,12 @@ let store = {
       correct: true
     }
   ],
-  lastSelected:"",
+  lastSelected: "",
   questionNumber: 0,
   score: 0,
   pageType:0,
   selectedIndex:0,
-  getQuizLength: function() { return this.questionPool.length },
+  getQuizLength: function() { return this.questionPool.length; },
   nextQuestion: function() {this.questionNumber = (this.questionNumber + 1)%this.getQuizLength();}
 };
 
@@ -90,12 +91,10 @@ function quizAppMain()
 //Create template form for quiz
 function constructQuiz()
 {
-  return `
-    <div class="quiz-container">
-      <form id="quiz-form">
-        
-      </form>
-    </div>
+  return `  
+    <form id="quiz-form">
+      
+    </form>
     `;
 }
 //Create template for question to place inside quiz form
@@ -105,10 +104,15 @@ function constructQuestion(quizQuestion) {
     <h3>${quizQuestion.question}</h3>
     <h3>Question:${store.questionNumber + 1}/${store.getQuizLength()}</h3>
     </header>
-    <div class="question-container">
-      ${constructAnswers(quizQuestion.answers)}
+    <div class="container">
+      <img src="img/pizza${store.questionNumber+1}.jpg"/>
+      <div class="question-container">
+        ${constructAnswers(quizQuestion.answers)}
+      </div>
+      <button id="submit-answer" type="submit">Submit</button>
     </div>
-    <button id="submit-answer" type="submit">Submit</button>
+    
+    
   `;
 }
 function constructAnswers(questionAnswers)
@@ -156,18 +160,17 @@ function render()
     case 0:
       renderQuiz();
       renderStartPage();
-      handleStartButton()
+      handleStartButton();
+      handleSubmitButton();
+      handleContinueButton();
       break;
     //Question Page
     case 1:
-      renderQuiz();
       renderQuestion();
-      handleSubmitButton();
       break;
     //Answer Page
     case 2:
       renderAnswerPage();
-      handleContinueButton();
       break;
     //Result Page
     case 3:
@@ -175,10 +178,7 @@ function render()
       renderResultPage();
       handleResetButton();
       break;
-    
-  }
-  
-  
+  } 
 }
 //Reset quiz values
 function initValues()
@@ -194,7 +194,6 @@ function renderQuiz()
 {
   $("#quiz-window").html(constructQuiz());
 }
-
 //Display question
 function renderQuestion()
 {
@@ -222,13 +221,28 @@ function evaluateAnswer(selectedAnswer) {
   //Check if an answer is picked
   if (selectedAnswer !== undefined) {
     $('html').off("keydown");
-    return store.questionPool[store.questionNumber].correctAnswer == selectedAnswer;
+    return store.questionPool[store.questionNumber].correctAnswer === selectedAnswer;
 
   }
   //Request user to pick an answer
   throw Error("No answer.");
 }
-
+function answerColor(correct) {
+  if (correct) {
+    $("body").attr("class", "correct-body");
+    $("#quiz-form").attr("class", "correct-form");
+    $("#continue").attr("class", "correct");
+  } else {
+    $("body").attr("class", "incorrect-body");
+    $("#quiz-form").attr("class", "incorrect-form");
+    $("#continue").attr("class", "incorrect");
+  }
+}
+function resetColor() {
+  $("body").attr("class", "");
+  $("#quiz-form").attr("class", "");
+  $("#continue").attr("class", "");
+}
 
 
 
@@ -257,7 +271,7 @@ function handleSubmitButton() {
   $('html').on("keydown", function(e) {
     
     
-    if(e.which == 38)
+    if(e.which === 38)
     {
       store.selectedIndex = (store.selectedIndex + 7)%store.questionPool[store.questionNumber].answers.length;
       unselectAnswer(store.questionPool[store.questionNumber].answers,(store.selectedIndex + 1)%store.questionPool[store.questionNumber].answers.length);
@@ -265,7 +279,7 @@ function handleSubmitButton() {
       
       console.log("Up Arrow");
     }
-    else if(e.which == 40)
+    else if(e.which === 40)
     {  
       store.selectedIndex = (store.selectedIndex + 1)%store.questionPool[store.questionNumber].answers.length;
       unselectAnswer(store.questionPool[store.questionNumber].answers,(store.selectedIndex + 7)%store.questionPool[store.questionNumber].answers.length);
@@ -273,7 +287,7 @@ function handleSubmitButton() {
 
       console.log("Down Arrow");
     }
-    else if(e.which == 13 || e.which == 39)
+    else if(e.which === 13 || e.which === 39)
     {
       submitBtn(e);
 
@@ -291,27 +305,29 @@ function handleSubmitButton() {
     
   });
 }
+
 function submitBtn(e)
 {
   e.preventDefault();
-    //Check answers/radio buttons
-    let selectedAnswer = $("input[name='quiz-question']:checked");
-    store.lastSelected = selectedAnswer;
-    //Check selected answer with actual answer for current question
-    let evalResult = evaluateAnswer(selectedAnswer.val());
-    if(evalResult)
-    {
-      store.score++;
-    }
-    store.pageType = 2;
-    console.log(store.questionNumber);
-    render();
+  //Check answers/radio buttons
+  let selectedAnswer = $("input[name='quiz-question']:checked");
+  store.lastSelected = selectedAnswer;
+  //Check selected answer with actual answer for current question
+  let evalResult = evaluateAnswer(selectedAnswer.val());
+  if(evalResult)
+  {
+    store.score++;
+  }
+  store.pageType = 2;
+  console.log(store.questionNumber);
+  render();
+  answerColor(evalResult);
 }
 
 function handleContinueButton() {
   
   $('html').on("keydown", function(e) {
-    if(e.which == 13 || e.which == 39)
+    if(e.which === 13 || e.which === 39)
     {
       
       $('html').off("keydown");
@@ -335,7 +351,7 @@ function continueBtn(e)
   e.preventDefault();
     console.log("Continue!!!");
     store.pageType = 1;
-    if(store.questionNumber == (store.getQuizLength()-1))
+    if(store.questionNumber === (store.getQuizLength()-1))
     {
       store.pageType = 3;
     }
@@ -343,15 +359,14 @@ function continueBtn(e)
     {
       store.nextQuestion();
     }
-    
-    
     render();
+    resetColor();
 }
 function handleStartButton()
 {
   $('html').on("keydown", function(e) {
     
-    if(e.which == 13 || e.which == 39)
+    if(e.which === 13 || e.which === 39)
     {
       $('html').off("keydown");
       startBtn(e);
@@ -381,7 +396,7 @@ function handleResetButton()
 {
   $('html').on("keydown", function(e) {
     
-    if(e.which == 13 || e.which == 39)
+    if(e.which === 13 || e.which === 39)
     {
       $('html').off("keydown");
       resetBtn(e);
@@ -401,9 +416,9 @@ function handleResetButton()
 function resetBtn(e)
 {
   e.preventDefault();
-    console.log("resetPressed");
-    initValues();
-    render();
+  console.log("resetPressed");
+  initValues();
+  render();
 }
 
 $(quizAppMain);
