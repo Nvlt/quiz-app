@@ -6,65 +6,67 @@ let store = {
   questionPool: [
     {
       question: 'When did the frozen pizza hit the american market?',
-      answers: {
-        a:'1824',
-        b:'1961',
-        c:'1962',
-        d:'Frozen pizza isnt pizza at all'
-      },
+      answers: [
+        '1824',
+        '1961',
+        '1962',
+        'Frozen pizza isnt pizza at all'
+      ],
       correctAnswer: '1962',
       correct: true
     },
     {
       question: 'Pineapple on pizza was invented where??',
-      answers: {
-        a:'Canada',
-        b:'Japan',
-        c:'Italy',
-        d:'United States'
-      },
+      answers: [
+        'Canada',
+        'Japan',
+        'Italy',
+        'United States'
+      ],
       correctAnswer: 'Canada',
       correct: true
     },
     {
       question: 'The health benefits of pizza are?',
-      answers: {
-        a:'Cures everything.',
-        b:'Reduces heart disease.',
-        c:'Reduces cancer risk.',
-        d:'Lol there are no benefits.'
-      },
+      answers: [
+        'Cures everything.',
+        'Reduces heart disease.',
+        'Reduces cancer risk.',
+        'Lol there are no benefits.'
+      ],
       correctAnswer: 'Reduces cancer risk.',
       correct: true
     },
     {
       question: 'In japan what is the favored way to eat pizza?',
-      answers: {
-        a:'With taco sauce.',
-        b:'With Mayo.',
-        c:'With fried bananas.',
-        d:'With teriyaki sauce and butter.'
-      },
+      answers: [
+        'With taco sauce.',
+        'With Mayo.',
+        'With fried bananas.',
+        'With teriyaki sauce and butter.'
+      ],
       correctAnswer: 'With Mayo.',
       correct: true
     },
     {
       question: 'What month is national pizza month?',
-      answers: {
-        a:'December',
-        b:'October',
-        c:'January',
-        d:'EVERY MONTH'
-      },
+      answers: [
+        'December',
+        'October',
+        'January',
+        'EVERY MONTH'
+      ],
       correctAnswer: 'October',
       correct: true
     }
   ],
-  quizStarted: false,
+  lastSelected:"",
   questionNumber: 0,
   score: 0,
-
+  pageType:0,
+  selectedIndex:0,
   getQuizLength: function() { return this.questionPool.length },
+  nextQuestion: function() {this.questionNumber = (this.questionNumber + 1)%this.getQuizLength();}
 };
 
 
@@ -77,11 +79,10 @@ function quizAppMain()
   //Render first page
 
   //Remove below after first page is established
-  renderQuizPage();
+  render();
 
   //Probably put in quizPage function
-  handleSubmitButton();
-  handleContinueButton();
+  
 }
 
 
@@ -98,38 +99,94 @@ function constructQuiz()
     `;
 }
 //Create template for question to place inside quiz form
-function constructQuestion(question) {
+function constructQuestion(quizQuestion) {
   return `
-    <h3>${question.question}</h3>
+    <header>
+    <h3>${quizQuestion.question}</h3>
+    <h3>Question:${store.questionNumber + 1}/${store.getQuizLength()}</h3>
+    </header>
     <div class="question-container">
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.a}"/>
-      <label>${question.answers.a}</label><br></span>
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.b}"/>
-      <label>${question.answers.b}</label><br></span>
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.c}"/>
-      <label>${question.answers.c}</label><br></span>
-      <span class="question-row"><input type="radio" name="quiz-question" value="${question.answers.d}"/>
-      <label>${question.answers.d}</label><br></span>
+      ${constructAnswers(quizQuestion.answers)}
     </div>
     <button id="submit-answer" type="submit">Submit</button>
   `;
 }
-function constructAnswerPage(selectedAnswer, question) {
+function constructAnswers(questionAnswers)
+{
+  return questionAnswers.reduce(function(html,answer){
+    return html += `<span class="question-row"><input type="radio" name="quiz-question" value="${answer}"/>
+    <label>${answer}</label><br></span>`;
+  },``)
+}
+
+function constructAnswerPage(quizQuestion) {
+  console.log(quizQuestion);
   return `
-    <h2>You picked ${selectedAnswer}</h2>
-    <h2>The answer was ${question.correctAnswer}</h2>
+    <h2>${quizQuestion.question}</h2>
+    <h2>The answer was ${quizQuestion.correctAnswer}</h2>
     <button id="continue" type="button">Contine</button>
     `;
 }
 
+function constructStartPage() {
+  return `
+    
+    <h3>Click start to begin.</h3>
+    <button id="start" type="button">Start Quiz</button>
+    `;
+}
+
+function constructResultPage() {
+  return `
+    <h2>You got:${store.score * (100/store.getQuizLength())}%!!!</h2>
+    <h2>Try again?</h2>
+    <button id="reset" type="button">restart</button>
+    `;
+}
 
 //***RENDERING FUNCTION SECTION***//
 //These should not create the html templates
 //Display full page
-function renderQuizPage()
+function render()
 {
-  renderQuiz();
-  renderQuestion();
+
+  switch(store.pageType)
+  {
+    //Start Page
+    case 0:
+      renderQuiz();
+      renderStartPage();
+      handleStartButton()
+      break;
+    //Question Page
+    case 1:
+      renderQuiz();
+      renderQuestion();
+      handleSubmitButton();
+      break;
+    //Answer Page
+    case 2:
+      renderAnswerPage();
+      handleContinueButton();
+      break;
+    //Result Page
+    case 3:
+      renderQuiz();
+      renderResultPage();
+      handleResetButton();
+      break;
+    
+  }
+  
+  
+}
+//Reset quiz values
+function initValues()
+{
+  store.questionNumber = 0;
+  store.score = 0;
+  store.pageType = 0;
+  store.lastSelected = "";
 }
 
 //Display quiz
@@ -144,9 +201,17 @@ function renderQuestion()
   $("#quiz-form").html(constructQuestion(store.questionPool[store.questionNumber]));
 }
 //Display answer page
-function renderAnswerPage(selectedAnswer)
+function renderAnswerPage()
 {
-  $("#quiz-form").html(constructAnswerPage(selectedAnswer, store.questionPool[store.questionNumber]));
+  $("#quiz-form").html(constructAnswerPage(store.questionPool[store.questionNumber]));
+}
+function renderStartPage()
+{
+  $("#quiz-form").html(constructStartPage());
+}
+function renderResultPage()
+{
+  $("#quiz-form").html(constructResultPage());
 }
 
 
@@ -156,63 +221,189 @@ function renderAnswerPage(selectedAnswer)
 function evaluateAnswer(selectedAnswer) {
   //Check if an answer is picked
   if (selectedAnswer !== undefined) {
-    goToAnswer(selectedAnswer)
+    $('html').off("keydown");
+    return store.questionPool[store.questionNumber].correctAnswer == selectedAnswer;
+
   }
   //Request user to pick an answer
-  return undefined;
+  throw Error("No answer.");
 }
 
-//Flag answer based on given evaluation
-function flagStatus(selectedRadio, eval) {
-  //Take answer and change text class to match correct or incorrect
-  let questionLabel = selectedRadio.next("label");
-  //Set correct answer to '.correct' class, probably remove this part in favor of another indicator though
-  if (eval) {
-    $(questionLabel).attr("class", "correct")
-  }
-  //Set selected answer to '.incorrect' class
-  else {
-    $(questionLabel).attr("class", "incorrect")
-  }
-}
 
-function goToAnswer(selectedAnswer)
-{
-  //If the user has made an answer
-  renderAnswerPage(selectedAnswer);
-  store.questionNumber = (store.questionNumber + 1)%store.getQuizLength();
-}
 
-//Check and go to next question
-// function goToAnswer(selectedAnswer, eval)
-// {
-//   //If the user has made an answer
-//   if (eval !== undefined) {
-//     renderAnswerPage(selectedAnswer);
-//     store.questionNumber = (store.questionNumber + 1)%store.getQuizLength();
-//   }
-// }
 
 //***BUTTON/EVENT FUNCTIONS ***/
 //Initialize the submit button
+function selectAnswer(questionAnswers, index)
+{
+  let selectedAnswer = $(`input[value="${questionAnswers[index]}"]`);
+  selectedAnswer.attr("checked",true);
+  console.log(`Select index:${index}`);
+
+
+}
+function unselectAnswer(questionAnswers, index)
+{
+  let selectedAnswer = $(`input[value="${questionAnswers[index]}"]`);
+  selectedAnswer.attr("checked",false);
+  console.log(`Unselect index:${index}`);
+
+
+}
 function handleSubmitButton() {
+  
+  
+  
+  $('html').on("keydown", function(e) {
+    
+    
+    if(e.which == 38)
+    {
+      store.selectedIndex = (store.selectedIndex + 7)%store.questionPool[store.questionNumber].answers.length;
+      unselectAnswer(store.questionPool[store.questionNumber].answers,(store.selectedIndex + 1)%store.questionPool[store.questionNumber].answers.length);
+      selectAnswer(store.questionPool[store.questionNumber].answers,store.selectedIndex);
+      
+      console.log("Up Arrow");
+    }
+    else if(e.which == 40)
+    {  
+      store.selectedIndex = (store.selectedIndex + 1)%store.questionPool[store.questionNumber].answers.length;
+      unselectAnswer(store.questionPool[store.questionNumber].answers,(store.selectedIndex + 7)%store.questionPool[store.questionNumber].answers.length);
+      selectAnswer(store.questionPool[store.questionNumber].answers,store.selectedIndex);  
+
+      console.log("Down Arrow");
+    }
+    else if(e.which == 13 || e.which == 39)
+    {
+      submitBtn(e);
+
+      console.log("Enter or Right Arrow");
+    }
+    else
+    {
+      console.log(e.which);
+    }
+    
+  });
   $('#quiz-form').on("submit", function(e) {
-    e.preventDefault();
+    
+    submitBtn(e); 
+    
+  });
+}
+function submitBtn(e)
+{
+  e.preventDefault();
     //Check answers/radio buttons
     let selectedAnswer = $("input[name='quiz-question']:checked");
+    store.lastSelected = selectedAnswer;
     //Check selected answer with actual answer for current question
     let evalResult = evaluateAnswer(selectedAnswer.val());
-    //If answered, render the next question
-    //goToAnswer(selectedAnswer, evalResult);
-  });
+    if(evalResult)
+    {
+      store.score++;
+    }
+    store.pageType = 2;
+    console.log(store.questionNumber);
+    render();
 }
 
 function handleContinueButton() {
-  $('#quiz-form').on("click", "#continue", function(e) {
-    e.preventDefault();
-    console.log("Continue!!!");
-    renderQuestion();
+  
+  $('html').on("keydown", function(e) {
+    if(e.which == 13 || e.which == 39)
+    {
+      
+      $('html').off("keydown");
+      continueBtn(e);
+
+      console.log("Enter or Right Arrow");
+    }
+    else
+    {
+      console.log(e.which);
+    }
+    
   });
+
+  $('#quiz-form').on("click", "#continue", function(e) {
+    continueBtn(e);
+  });
+}
+function continueBtn(e)
+{
+  e.preventDefault();
+    console.log("Continue!!!");
+    store.pageType = 1;
+    if(store.questionNumber == (store.getQuizLength()-1))
+    {
+      store.pageType = 3;
+    }
+    else
+    {
+      store.nextQuestion();
+    }
+    
+    
+    render();
+}
+function handleStartButton()
+{
+  $('html').on("keydown", function(e) {
+    
+    if(e.which == 13 || e.which == 39)
+    {
+      $('html').off("keydown");
+      startBtn(e);
+
+      console.log("Enter or Right Arrow");
+    }
+    else
+    {
+      console.log(e.which);
+    }
+    
+  });
+  
+  
+  $('#quiz-form').on("click", "#start", function(e) {
+    startBtn(e);    
+  });
+}
+function startBtn(e)
+{
+  e.preventDefault();
+  console.log("Start!");
+  store.pageType = 1;
+  render();
+}
+function handleResetButton()
+{
+  $('html').on("keydown", function(e) {
+    
+    if(e.which == 13 || e.which == 39)
+    {
+      $('html').off("keydown");
+      resetBtn(e);
+
+      console.log("Enter or Right Arrow");
+    }
+    else
+    {
+      console.log(e.which);
+    }
+    
+  });
+  $('#quiz-form').on("click", "#reset", function(e) {
+    resetBtn(e);
+  });
+}
+function resetBtn(e)
+{
+  e.preventDefault();
+    console.log("resetPressed");
+    initValues();
+    render();
 }
 
 $(quizAppMain);
