@@ -118,7 +118,7 @@ function constructAnswerPage(quizQuestion) {
   console.log(quizQuestion);
   return `
     <h2>${quizQuestion.question}</h2>
-    <h2>${quizQuestion.result}: The answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
+    <h2>${quizQuestion.result}: gitThe answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
     <div class="button-container"><button id="continue" type="button">Contine</button></div>
     `;
 }
@@ -151,11 +151,8 @@ function render()
       renderQuiz();
       renderStartPage();
       handleStartButton();
-<<<<<<< HEAD
 
       
-=======
->>>>>>> cac94af54ceca62f5d91a1bc7adb5bb71bee4c4a
       break;
     //Question Page
     case 1:
@@ -167,11 +164,7 @@ function render()
     case 2:
       renderQuiz();
       renderAnswerPage();
-<<<<<<< HEAD
       handleContinueButton();                                                                                                                                                                                                      
-=======
-      handleContinueButton();
->>>>>>> cac94af54ceca62f5d91a1bc7adb5bb71bee4c4a
       break;
     //Result Page
     case 3:
