@@ -97,11 +97,11 @@ function constructQuestion(quizQuestion) {
     <h3>Question:${store.questionNumber + 1}/${store.getQuizLength()}</h3>
     </header>
     <div class="container">
-      <img src="img/pizza${store.questionNumber+1}.jpg" alt="Pizza"/>
+      <img src="img/pizza${store.questionNumber+1}.jpg" alt="Pizza Image"/>
       <div class="question-container">
         ${constructAnswers(quizQuestion.answers)}
       </div>
-      <button id="submit-answer" type="submit" alt="Submit">Submit</button>
+      <button id="submit-answer" type="submit">Submit</button>
     </div>
   `;
 }
@@ -109,7 +109,7 @@ function constructQuestion(quizQuestion) {
 function constructAnswers(questionAnswers)
 {
   return questionAnswers.reduce(function(html,answer){
-    return html += `<span class="question-row"><input type="radio" name="quiz-question" value="${answer}" alt="${answer}"/>
+    return html += `<span class="question-row"><input type="radio" name="quiz-question" value="${answer}"/>
     <label>${answer}</label><br></span>`;
   },``);
 }
@@ -119,14 +119,14 @@ function constructAnswerPage(quizQuestion) {
   return `
     <h2>${quizQuestion.question}</h2>
     <h2>The answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
-    <div class="button-container"><button id="continue" type="button" alt="Continue">Contine</button></div>
+    <div class="button-container"><button id="continue" type="button">Contine</button></div>
     `;
 }
 //Template for first page
 function constructStartPage() {
   return `
     <h2 class="header-container">Click start to begin.</h2>
-    <div class="button-container"><button id="start" type="button" alt="Start">Start Quiz</button></div>
+    <div class="button-container"><button id="start" type="button">Start Quiz</button></div>
     `;
 }
 //Template for after quiz is completed
@@ -134,7 +134,7 @@ function constructResultPage() {
   return `
     <h2 class="header-container">You got: ${store.score * (100/store.getQuizLength())}%!!!</h2>
     <h2>Try again?</h2>
-    <div class="button-container"><button id="reset" type="button" alt="Restart">Restart</button></div>
+    <div class="button-container"><button id="reset" type="button">Restart</button></div>
   `;
 }
 
