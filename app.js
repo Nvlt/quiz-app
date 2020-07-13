@@ -151,16 +151,16 @@ function render()
       renderQuiz();
       renderStartPage();
       handleStartButton();
-      handleSubmitButton();
-      handleContinueButton();
       break;
     //Question Page
     case 1:
       renderQuestion();
+      handleSubmitButton();
       break;
     //Answer Page
     case 2:
       renderAnswerPage();
+      handleContinueButton();
       break;
     //Result Page
     case 3:
