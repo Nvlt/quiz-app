@@ -118,7 +118,7 @@ function constructAnswerPage(quizQuestion) {
   console.log(quizQuestion);
   return `
     <h2>${quizQuestion.question}</h2>
-    <h2>${quizQuestion.result}: gitThe answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
+    <h2>${quizQuestion.result}: The answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
     <div class="button-container"><button id="continue" type="button">Contine</button></div>
     `;
 }
