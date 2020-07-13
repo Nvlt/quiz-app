@@ -76,16 +76,8 @@ let store = {
 //Run full Quiz App
 function quizAppMain()
 {
-  //Should render first page before rendering quiz pages
-  //Render first page
-
-  //Remove below after first page is established
   render();
-
-  //Probably put in quizPage function
-  
 }
-
 
 //***CONSTRUCTION/TEMPLATE FUNCTIONS FOR HTML PAGES***//
 //Create template form for quiz
@@ -105,55 +97,53 @@ function constructQuestion(quizQuestion) {
     <h3>Question:${store.questionNumber + 1}/${store.getQuizLength()}</h3>
     </header>
     <div class="container">
-      <img src="img/pizza${store.questionNumber+1}.jpg"/>
+      <img src="img/pizza${store.questionNumber+1}.jpg" alt="Pizza"/>
       <div class="question-container">
         ${constructAnswers(quizQuestion.answers)}
       </div>
-      <button id="submit-answer" type="submit">Submit</button>
+      <button id="submit-answer" type="submit" alt="Submit">Submit</button>
     </div>
-    
-    
   `;
 }
+//Template for each answer for question
 function constructAnswers(questionAnswers)
 {
   return questionAnswers.reduce(function(html,answer){
-    return html += `<span class="question-row"><input type="radio" name="quiz-question" value="${answer}"/>
+    return html += `<span class="question-row"><input type="radio" name="quiz-question" value="${answer}" alt="${answer}"/>
     <label>${answer}</label><br></span>`;
-  },``)
+  },``);
 }
-
+//Template for after the question is answered
 function constructAnswerPage(quizQuestion) {
   console.log(quizQuestion);
   return `
     <h2>${quizQuestion.question}</h2>
-    <h2>The answer was ${quizQuestion.correctAnswer}</h2>
-    <button id="continue" type="button">Contine</button>
+    <h2>The answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
+    <div class="button-container"><button id="continue" type="button" alt="Continue">Contine</button></div>
     `;
 }
-
+//Template for first page
 function constructStartPage() {
   return `
-    
-    <h3>Click start to begin.</h3>
-    <button id="start" type="button">Start Quiz</button>
+    <h2 class="header-container">Click start to begin.</h2>
+    <div class="button-container"><button id="start" type="button" alt="Start">Start Quiz</button></div>
     `;
 }
-
+//Template for after quiz is completed
 function constructResultPage() {
   return `
-    <h2>You got:${store.score * (100/store.getQuizLength())}%!!!</h2>
+    <h2 class="header-container">You got: ${store.score * (100/store.getQuizLength())}%!!!</h2>
     <h2>Try again?</h2>
-    <button id="reset" type="button">restart</button>
-    `;
+    <div class="button-container"><button id="reset" type="button" alt="Restart">Restart</button></div>
+  `;
 }
 
 //***RENDERING FUNCTION SECTION***//
 //These should not create the html templates
 //Display full page
+//Display different page based on quiz storage state
 function render()
 {
-
   switch(store.pageType)
   {
     //Start Page
@@ -180,7 +170,7 @@ function render()
       break;
   } 
 }
-//Reset quiz values
+//Set quiz values
 function initValues()
 {
   store.questionNumber = 0;
@@ -204,10 +194,12 @@ function renderAnswerPage()
 {
   $("#quiz-form").html(constructAnswerPage(store.questionPool[store.questionNumber]));
 }
+//Display the Starting page
 function renderStartPage()
 {
   $("#quiz-form").html(constructStartPage());
 }
+//Display the End Page
 function renderResultPage()
 {
   $("#quiz-form").html(constructResultPage());
@@ -227,17 +219,22 @@ function evaluateAnswer(selectedAnswer) {
   //Request user to pick an answer
   throw Error("No answer.");
 }
+//Change CSS colors based on answer
 function answerColor(correct) {
+  //Green
   if (correct) {
     $("body").attr("class", "correct-body");
     $("#quiz-form").attr("class", "correct-form");
     $("#continue").attr("class", "correct");
-  } else {
+  }
+  //Red
+   else {
     $("body").attr("class", "incorrect-body");
     $("#quiz-form").attr("class", "incorrect-form");
     $("#continue").attr("class", "incorrect");
   }
 }
+//Set CSS colors back to default
 function resetColor() {
   $("body").attr("class", "");
   $("#quiz-form").attr("class", "");
@@ -247,65 +244,44 @@ function resetColor() {
 
 
 //***BUTTON/EVENT FUNCTIONS ***/
-//Initialize the submit button
+//Set selected answer from question storage to checked
 function selectAnswer(questionAnswers, index)
 {
   let selectedAnswer = $(`input[value="${questionAnswers[index]}"]`);
   selectedAnswer.attr("checked",true);
-  console.log(`Select index:${index}`);
-
-
 }
+//Unselect other answers and set to unchecked
 function unselectAnswer(questionAnswers, index)
 {
   let selectedAnswer = $(`input[value="${questionAnswers[index]}"]`);
   selectedAnswer.attr("checked",false);
-  console.log(`Unselect index:${index}`);
-
-
 }
+//Event listener for Submit button
+//Keyboard inputs also work
 function handleSubmitButton() {
-  
-  
-  
   $('html').on("keydown", function(e) {
-    
-    
     if(e.which === 38)
     {
       store.selectedIndex = (store.selectedIndex + 7)%store.questionPool[store.questionNumber].answers.length;
       unselectAnswer(store.questionPool[store.questionNumber].answers,(store.selectedIndex + 1)%store.questionPool[store.questionNumber].answers.length);
       selectAnswer(store.questionPool[store.questionNumber].answers,store.selectedIndex);
-      
-      console.log("Up Arrow");
     }
     else if(e.which === 40)
     {  
       store.selectedIndex = (store.selectedIndex + 1)%store.questionPool[store.questionNumber].answers.length;
       unselectAnswer(store.questionPool[store.questionNumber].answers,(store.selectedIndex + 7)%store.questionPool[store.questionNumber].answers.length);
       selectAnswer(store.questionPool[store.questionNumber].answers,store.selectedIndex);  
-
-      console.log("Down Arrow");
     }
     else if(e.which === 13 || e.which === 39)
     {
       submitBtn(e);
-
-      console.log("Enter or Right Arrow");
     }
-    else
-    {
-      console.log(e.which);
-    }
-    
   });
   $('#quiz-form').on("submit", function(e) {
-    
     submitBtn(e); 
-    
   });
 }
-
+//Run the answer checks after submit is entered
 function submitBtn(e)
 {
   e.preventDefault();
@@ -319,72 +295,54 @@ function submitBtn(e)
     store.score++;
   }
   store.pageType = 2;
-  console.log(store.questionNumber);
   render();
   answerColor(evalResult);
 }
-
+//Event listener for Continue button
 function handleContinueButton() {
   
   $('html').on("keydown", function(e) {
     if(e.which === 13 || e.which === 39)
     {
-      
       $('html').off("keydown");
       continueBtn(e);
-
-      console.log("Enter or Right Arrow");
-    }
-    else
-    {
-      console.log(e.which);
-    }
-    
+    }    
   });
-
   $('#quiz-form').on("click", "#continue", function(e) {
     continueBtn(e);
   });
 }
+//Display next page
 function continueBtn(e)
 {
   e.preventDefault();
-    console.log("Continue!!!");
-    store.pageType = 1;
-    if(store.questionNumber === (store.getQuizLength()-1))
-    {
-      store.pageType = 3;
-    }
-    else
-    {
-      store.nextQuestion();
-    }
-    render();
-    resetColor();
+  store.pageType = 1;
+  if(store.questionNumber === (store.getQuizLength()-1))
+  {
+    store.pageType = 3;
+  }
+  else
+  {
+    store.nextQuestion();
+  }
+  render();
+  resetColor();
 }
+//Event listener for starting the quiz
 function handleStartButton()
 {
   $('html').on("keydown", function(e) {
-    
     if(e.which === 13 || e.which === 39)
     {
       $('html').off("keydown");
       startBtn(e);
-
-      console.log("Enter or Right Arrow");
     }
-    else
-    {
-      console.log(e.which);
-    }
-    
   });
-  
-  
   $('#quiz-form').on("click", "#start", function(e) {
     startBtn(e);    
   });
 }
+//Start the quiz
 function startBtn(e)
 {
   e.preventDefault();
@@ -392,10 +350,10 @@ function startBtn(e)
   store.pageType = 1;
   render();
 }
+//Event listener for Reset button
 function handleResetButton()
 {
   $('html').on("keydown", function(e) {
-    
     if(e.which === 13 || e.which === 39)
     {
       $('html').off("keydown");
@@ -403,16 +361,12 @@ function handleResetButton()
 
       console.log("Enter or Right Arrow");
     }
-    else
-    {
-      console.log(e.which);
-    }
-    
   });
   $('#quiz-form').on("click", "#reset", function(e) {
     resetBtn(e);
   });
 }
+//Restart the Quiz
 function resetBtn(e)
 {
   e.preventDefault();
