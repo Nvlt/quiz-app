@@ -151,8 +151,11 @@ function render()
       renderQuiz();
       renderStartPage();
       handleStartButton();
+<<<<<<< HEAD
 
       
+=======
+>>>>>>> cac94af54ceca62f5d91a1bc7adb5bb71bee4c4a
       break;
     //Question Page
     case 1:
@@ -164,7 +167,11 @@ function render()
     case 2:
       renderQuiz();
       renderAnswerPage();
+<<<<<<< HEAD
       handleContinueButton();                                                                                                                                                                                                      
+=======
+      handleContinueButton();
+>>>>>>> cac94af54ceca62f5d91a1bc7adb5bb71bee4c4a
       break;
     //Result Page
     case 3:
