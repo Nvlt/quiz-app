@@ -118,7 +118,7 @@ function constructAnswerPage(quizQuestion) {
   console.log(quizQuestion);
   return `
     <h2>${quizQuestion.question}</h2>
-    <h2>The answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
+    <h2>${quizQuestion.result}: The answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
     <div class="button-container"><button id="continue" type="button">Contine</button></div>
     `;
 }
@@ -151,16 +151,20 @@ function render()
       renderQuiz();
       renderStartPage();
       handleStartButton();
-      handleSubmitButton();
-      handleContinueButton();
+
+      
       break;
     //Question Page
     case 1:
+      renderQuiz();
       renderQuestion();
+      handleSubmitButton();
       break;
     //Answer Page
     case 2:
+      renderQuiz();
       renderAnswerPage();
+      handleContinueButton();                                                                                                                                                                                                      
       break;
     //Result Page
     case 3:
@@ -293,6 +297,11 @@ function submitBtn(e)
   if(evalResult)
   {
     store.score++;
+    store.questionPool[store.questionNumber].result = "That's right! "
+  }
+  else
+  {
+    store.questionPool[store.questionNumber].result = "Nope! "
   }
   store.pageType = 2;
   render();
