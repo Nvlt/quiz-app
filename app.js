@@ -94,7 +94,7 @@ function constructQuestion(quizQuestion) {
   return `
     <header>
     <h3>${quizQuestion.question}</h3>
-    <h3>Question:${store.questionNumber + 1}/${store.getQuizLength()}</h3>
+    <h3>Question: ${store.questionNumber + 1}/${store.getQuizLength()} Score: ${store.score * (100/store.getQuizLength())}%</h3>
     </header>
     <div class="container">
       <img src="img/pizza${store.questionNumber+1}.jpg" alt="Pizza Image"/>
@@ -117,6 +117,7 @@ function constructAnswers(questionAnswers)
 function constructAnswerPage(quizQuestion) {
   console.log(quizQuestion);
   return `
+    <h2>Score: ${store.score * (100/store.getQuizLength())}%</h2>
     <h2>${quizQuestion.question}</h2>
     <h2>${quizQuestion.result}: The answer was <span class="answer">${quizQuestion.correctAnswer}</span></h2>
     <div class="button-container"><button id="continue" type="button">Contine</button></div>
